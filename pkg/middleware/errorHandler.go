@@ -1,23 +1,27 @@
 package middleware
 
 import (
-	"IdEmpotencia/pkg/apperror"
-	"IdEmpotencia/pkg/message"
+	"encoding/json"
+	"log"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/log"
+	"IdEmpotencia/pkg/apperror"
 )
 
-func ErrorHandler(c *fiber.Ctx) error {
-	err := c.Next()
+func ErrorHandler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Println("Error interno del servidor:", err)
+				respondWithAppError(w, apperror.InternalServerError())
+			}
+		}()
+		next.ServeHTTP(w, r)
+	})
+}
 
-	if err != nil {
-		if e, ok := err.(*apperror.AppError); ok {
-			log.Error(message.ErrorResponse(e))
-			return c.Status(e.Code).JSON(message.ErrorResponse(e))
-		}
-		log.Error(message.ErrorResponse(err))
-		return c.Status(fiber.StatusInternalServerError).JSON(message.ErrorResponse(err))
-	}
-	return nil
+func respondWithAppError(w http.ResponseWriter, err *apperror.AppError) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(err.Code)
+	json.NewEncoder(w).Encode(map[string]string{"error": err.Message})
 }

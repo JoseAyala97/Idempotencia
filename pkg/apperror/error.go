@@ -1,7 +1,6 @@
 package apperror
 
 import (
-	"fmt"
 	"net/http"
 )
 
@@ -11,7 +10,7 @@ type AppError struct {
 }
 
 func (r *AppError) Error() string {
-	return fmt.Sprintf(r.Message)
+	return r.Message
 }
 
 func NewAppError(code int, message string) *AppError {
