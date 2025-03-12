@@ -1,27 +1,25 @@
 package message
 
-import "github.com/gofiber/fiber/v2"
-
-func SuccessResponseSlice(data *[]any) *fiber.Map {
-	return &fiber.Map{
+func SuccessResponseSlice(data *[]any) map[string]interface{} {
+	return map[string]interface{}{
 		"status": true,
 		"data":   data,
 		"error":  nil,
 	}
 }
 
-func SuccessResponse(data any) *fiber.Map {
-	return &fiber.Map{
+func SuccessResponse(data any) map[string]interface{} {
+	return map[string]interface{}{
 		"status": true,
 		"data":   data,
 		"error":  nil,
 	}
 }
 
-func ErrorResponse(err error) *fiber.Map {
-	return &fiber.Map{
+func ErrorResponse(err error) map[string]interface{} {
+	return map[string]interface{}{
 		"status": false,
-		"data":   "",
+		"data":   nil,
 		"error":  err.Error(),
 	}
 }
